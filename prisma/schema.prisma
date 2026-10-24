@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("MANAGER")
+  createdAt    DateTime @default(now())
+}
+
+model Category {
+  id           String          @id @default(cuid())
+  name         String          @unique
+  displayOrder Int             @default(0)
+  items        InventoryItem[]
+  createdAt    DateTime        @default(now())
+}
+
+model InventoryItem {
+  id               String             @id @default(cuid())
+  name             String             @unique
+  categoryId       String
+  category         Category           @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  unit             String             // كجم، جرام، لتر، عبوة، قطعة، كرتونة
+  currentStock     Float              @default(0)
+  minStock         Float              @default(0)
+  targetStock      Float              @default(0)
+  avgUnitPrice     Float              @default(0)
+  lastPurchaseDate DateTime?
+  lastSupplier     String?
+  notes            String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  purchases        PurchaseRecord[]
+  transactions     StockTransaction[]
+}
+
+model PurchaseRecord {
+  id           String        @id @default(cuid())
+  itemId       String
+  item         InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  quantity     Float
+  unitPrice    Float
+  totalPrice   Float
+  supplier     String?
+  purchaseDate DateTime      @default(now())
+  notes        String?
+  createdAt    DateTime      @default(now())
+}
+
+model StockTransaction {
+  id           String        @id @default(cuid())
+  itemId       String
+  item         InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  quantity     Float
+  type         String        // "USAGE" | "WASTE" | "ADJUSTMENT"
+  reason       String        // "استخدام مطبخ" | "تالف" | "هدر" | "تسوية جرد"
+  date         DateTime      @default(now())
+  notes        String?
+  recordedBy   String?
+  createdAt    DateTime      @default(now())
+}
