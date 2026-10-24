@@ -23,7 +23,10 @@ import {
   Clock,
   ChevronDown,
   Filter,
-  Info
+  Info,
+  Download,
+  Laptop,
+  Smartphone
 } from 'lucide-react';
 
 interface Category {
@@ -105,6 +108,11 @@ export default function InventoryDashboard() {
   const [isExporting, setIsExporting] = useState(false);
   const [alertMessage, setAlertMessage] = useState<{ text: string; type: 'success' | 'error' | 'warning' } | null>(null);
 
+  // PWA Install State
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [showInstallGuideModal, setShowInstallGuideModal] = useState(false);
+
   // Forms
   const [itemForm, setItemForm] = useState({
     name: '',
@@ -174,7 +182,42 @@ export default function InventoryDashboard() {
 
   useEffect(() => {
     loadData();
+
+    // PWA beforeinstallprompt handler
+    const handleBeforeInstall = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+
+    window.addEventListener('appinstalled', () => {
+      setIsInstalled(true);
+      setDeferredPrompt(null);
+      showAlert('تم تثبيت برنامج المخزون بنجاح كأيقونة على جهازك!', 'success');
+    });
+
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+    };
   }, []);
+
+  const handleInstallApp = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        showAlert('جارٍ تثبيت برنامج المخزون على جهازك...', 'success');
+      }
+      setDeferredPrompt(null);
+    } else {
+      setShowInstallGuideModal(true);
+    }
+  };
 
   const showAlert = (text: string, type: 'success' | 'error' | 'warning') => {
     setAlertMessage({ text, type });
@@ -444,6 +487,16 @@ export default function InventoryDashboard() {
 
           {/* Action Buttons Toolbar */}
           <div className="flex items-center flex-wrap gap-2.5">
+            {!isInstalled && (
+              <button
+                onClick={handleInstallApp}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 shadow-lg shadow-amber-500/25 transition-all active:scale-95 animate-pulse"
+                title="تثبيت البرنامج كأيقونة مستقلة على سطح المكتب أو شاشة الموبايل"
+              >
+                <Download className="w-4 h-4 stroke-[3]" />
+                <span>تثبيت البرنامج على الجهاز</span>
+              </button>
+            )}
             <button
               onClick={() => {
                 setPurchaseForm((prev) => ({ ...prev, itemId: items[0]?.id || '' }));
@@ -1840,6 +1893,74 @@ export default function InventoryDashboard() {
                 className="px-5 py-2.5 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs"
               >
                 إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 5: PWA INSTALL GUIDE */}
+      {/* ========================================================= */}
+      {showInstallGuideModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                  <Download className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-white">طريقة تثبيت البرنامج على جهازك</h3>
+                  <p className="text-[11px] text-slate-400">ليعمل كأي برنامج مثبت بأيقونة مستقلة</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowInstallGuideModal(false)}
+                className="p-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3.5 text-xs">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-1.5">
+                <div className="flex items-center gap-2 font-bold text-amber-400">
+                  <Laptop className="w-4 h-4 text-amber-500" />
+                  <span>على أجهزة الكمبيوتر (ويندوز أو ماك):</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed pr-6">
+                  ستجد أيقونة تثبيت صغيرة (شاشة بها سهم أو علامة <strong>⊕</strong>) في أعلى شريط العنوان بمتصفحك (كروم أو إيدج)، اضغط عليها ثم اختر <strong>«تثبيت / Install»</strong> ليظهر البرنامج فوراً على سطح المكتب وقائمة ابدأ.
+                </p>
+              </div>
+
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-1.5">
+                <div className="flex items-center gap-2 font-bold text-emerald-400">
+                  <Smartphone className="w-4 h-4 text-emerald-500" />
+                  <span>على هواتف الأندرويد (Android / Chrome):</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed pr-6">
+                  اضغط على زر القائمة (الثلاث نقاط في أعلى المتصفح) واختر <strong>«تثبيت التطبيق»</strong> أو <strong>«إضافة إلى الشاشة الرئيسية»</strong>.
+                </p>
+              </div>
+
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-1.5">
+                <div className="flex items-center gap-2 font-bold text-blue-400">
+                  <Smartphone className="w-4 h-4 text-blue-500" />
+                  <span>على هواتف الآيفون (iOS Safari):</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed pr-6">
+                  اضغط على زر <strong>المشاركة (Share)</strong> في أسفل متصفح Safari، ثم اختر <strong>«إضافة إلى الصفحة الرئيسية / Add to Home Screen»</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800 flex justify-end">
+              <button
+                onClick={() => setShowInstallGuideModal(false)}
+                className="px-6 py-2.5 rounded-xl font-black bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs shadow-md"
+              >
+                فهمت ذلك
               </button>
             </div>
           </div>
