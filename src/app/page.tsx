@@ -624,12 +624,12 @@ export default function InventoryDashboard() {
         {activeTab !== 'dashboard' && (
           <div className="flex items-center justify-between bg-slate-900/60 border border-slate-800/80 px-4 py-2.5 rounded-xl no-print">
             <span className="text-xs text-slate-400">
-              القسم النشط حالياً:{' '}
+              القسم:{' '}
               <strong className="text-white">
-                {activeTab === 'items' && `جدول المخزون (${items.length} صنف)`}
-                {activeTab === 'purchases' && `سجل المشتريات (${purchases.length} فاتورة)`}
-                {activeTab === 'usage' && `سجل الاستهلاك والهدر (${transactions.length} حركة)`}
-                {activeTab === 'shortages' && `قائمة النواقص والمطلوب شراؤه (${shortageItems.length} صنف)`}
+                {activeTab === 'items' && 'جدول المخزون'}
+                {activeTab === 'purchases' && 'سجل المشتريات'}
+                {activeTab === 'usage' && 'سجل الاستهلاك والهدر'}
+                {activeTab === 'shortages' && 'النواقص والمطلوب شراؤه'}
               </strong>
             </span>
             <button
