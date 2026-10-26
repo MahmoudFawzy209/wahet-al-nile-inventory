@@ -14,7 +14,6 @@ import {
   RefreshCw,
   Edit2,
   Trash2,
-  Layers,
   CheckCircle2,
   X,
   Download,
@@ -500,69 +499,6 @@ export default function InventoryDashboard() {
             </button>
           </div>
         </div>
-
-        {/* Navigation Tabs Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800 flex overflow-x-auto gap-2 py-1.5 scrollbar-none">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
-              activeTab === 'dashboard'
-                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Layers className="w-4 h-4" />
-            <span>لوحة التحكم الرئيسية</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('items')}
-            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
-              activeTab === 'items'
-                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Package className="w-4 h-4" />
-            <span>جدول المخزون ({items.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('purchases')}
-            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
-              activeTab === 'purchases'
-                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <ShoppingCart className="w-4 h-4 text-emerald-400" />
-            <span>سجل المشتريات ({purchases.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('usage')}
-            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
-              activeTab === 'usage'
-                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <TrendingDown className="w-4 h-4 text-rose-400" />
-            <span>سجل الاستهلاك والهدر ({transactions.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('shortages')}
-            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
-              activeTab === 'shortages'
-                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            <span>النواقص والمطلوب شراؤه ({shortageItems.length})</span>
-          </button>
-        </div>
       </header>
 
       {/* Print View Header */}
@@ -577,100 +513,139 @@ export default function InventoryDashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* 4 Clean Navigation Cards - Always Visible at the Top */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: جدول المخزون */}
+          <button
+            onClick={() => setActiveTab(activeTab === 'items' ? 'dashboard' : 'items')}
+            className={`p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between border cursor-pointer ${
+              activeTab === 'items'
+                ? 'bg-amber-950/50 border-amber-500 ring-2 ring-amber-500/50'
+                : 'bg-slate-900 hover:bg-slate-800/80 border-slate-800 hover:border-amber-500/50'
+            }`}
+          >
+            <div>
+              <span className="text-xs text-slate-400 block font-medium">عرض وإدارة المواد</span>
+              <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-400 transition-colors">
+                جدول المخزون ({items.length})
+              </h3>
+            </div>
+            <div
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform ${
+                activeTab === 'items'
+                  ? 'bg-amber-500 text-slate-950 scale-105'
+                  : 'bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-110'
+              }`}
+            >
+              <Package className="w-5 h-5" />
+            </div>
+          </button>
+
+          {/* Card 2: سجل المشتريات */}
+          <button
+            onClick={() => setActiveTab(activeTab === 'purchases' ? 'dashboard' : 'purchases')}
+            className={`p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between border cursor-pointer ${
+              activeTab === 'purchases'
+                ? 'bg-emerald-950/50 border-emerald-500 ring-2 ring-emerald-500/50'
+                : 'bg-slate-900 hover:bg-slate-800/80 border-slate-800 hover:border-emerald-500/50'
+            }`}
+          >
+            <div>
+              <span className="text-xs text-slate-400 block font-medium">فواتير وتوريدات الشراء</span>
+              <h3 className="text-lg font-black text-white mt-1 group-hover:text-emerald-400 transition-colors">
+                سجل المشتريات ({purchases.length})
+              </h3>
+            </div>
+            <div
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform ${
+                activeTab === 'purchases'
+                  ? 'bg-emerald-500 text-slate-950 scale-105'
+                  : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-110'
+              }`}
+            >
+              <ShoppingCart className="w-5 h-5" />
+            </div>
+          </button>
+
+          {/* Card 3: سجل الاستهلاك والهدر */}
+          <button
+            onClick={() => setActiveTab(activeTab === 'usage' ? 'dashboard' : 'usage')}
+            className={`p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between border cursor-pointer ${
+              activeTab === 'usage'
+                ? 'bg-rose-950/50 border-rose-500 ring-2 ring-rose-500/50'
+                : 'bg-slate-900 hover:bg-slate-800/80 border-slate-800 hover:border-rose-500/50'
+            }`}
+          >
+            <div>
+              <span className="text-xs text-slate-400 block font-medium">المنصرف للطهي والتالف</span>
+              <h3 className="text-lg font-black text-white mt-1 group-hover:text-rose-400 transition-colors">
+                سجل الاستهلاك والهدر ({transactions.length})
+              </h3>
+            </div>
+            <div
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform ${
+                activeTab === 'usage'
+                  ? 'bg-rose-500 text-slate-950 scale-105'
+                  : 'bg-rose-500/10 border border-rose-500/20 text-rose-400 group-hover:scale-110'
+              }`}
+            >
+              <TrendingDown className="w-5 h-5" />
+            </div>
+          </button>
+
+          {/* Card 4: النواقص والمطلوب شراؤه */}
+          <button
+            onClick={() => setActiveTab(activeTab === 'shortages' ? 'dashboard' : 'shortages')}
+            className={`p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between border cursor-pointer ${
+              activeTab === 'shortages'
+                ? 'bg-amber-950/50 border-amber-500 ring-2 ring-amber-500/50'
+                : 'bg-slate-900 hover:bg-slate-800/80 border-slate-800 hover:border-amber-500/50'
+            }`}
+          >
+            <div>
+              <span className="text-xs text-slate-400 block font-medium">المواد المنخفضة والنافدة</span>
+              <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-400 transition-colors">
+                النواقص والمطلوب شراؤه ({shortageItems.length})
+              </h3>
+            </div>
+            <div
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform ${
+                activeTab === 'shortages'
+                  ? 'bg-amber-500 text-slate-950 scale-105'
+                  : 'bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-110'
+              }`}
+            >
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+          </button>
+        </div>
+
+        {/* Return to Dashboard bar when viewing any sub-section */}
+        {activeTab !== 'dashboard' && (
+          <div className="flex items-center justify-between bg-slate-900/60 border border-slate-800/80 px-4 py-2.5 rounded-xl no-print">
+            <span className="text-xs text-slate-400">
+              القسم النشط حالياً:{' '}
+              <strong className="text-white">
+                {activeTab === 'items' && `جدول المخزون (${items.length} صنف)`}
+                {activeTab === 'purchases' && `سجل المشتريات (${purchases.length} فاتورة)`}
+                {activeTab === 'usage' && `سجل الاستهلاك والهدر (${transactions.length} حركة)`}
+                {activeTab === 'shortages' && `قائمة النواقص والمطلوب شراؤه (${shortageItems.length} صنف)`}
+              </strong>
+            </span>
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className="flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
+            >
+              <span>← العودة لعرض آخر الحركات المسجلة</span>
+            </button>
+          </div>
+        )}
+
         {/* ========================================================= */}
-        {/* TAB 1: DASHBOARD OVERVIEW */}
+        {/* DEFAULT VIEW: RECENT PURCHASES & RECENT USAGE */}
         {/* ========================================================= */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
-            {/* 4 Clean Navigation Cards replacing old KPI cards (Note 5) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1: جدول المخزون */}
-              <button
-                onClick={() => setActiveTab('items')}
-                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
-              >
-                <div>
-                  <span className="text-xs text-slate-400 block font-medium">عرض وإدارة المواد</span>
-                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-400 transition-colors">
-                    جدول المخزون ({items.length})
-                  </h3>
-                </div>
-                <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
-                  <Package className="w-5 h-5" />
-                </div>
-              </button>
-
-              {/* Card 2: سجل المشتريات */}
-              <button
-                onClick={() => setActiveTab('purchases')}
-                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-emerald-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
-              >
-                <div>
-                  <span className="text-xs text-slate-400 block font-medium">فواتير وتوريدات الشراء</span>
-                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-emerald-400 transition-colors">
-                    سجل المشتريات ({purchases.length})
-                  </h3>
-                </div>
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
-                  <ShoppingCart className="w-5 h-5" />
-                </div>
-              </button>
-
-              {/* Card 3: سجل الاستهلاك والهدر */}
-              <button
-                onClick={() => setActiveTab('usage')}
-                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-rose-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
-              >
-                <div>
-                  <span className="text-xs text-slate-400 block font-medium">المنصرف للطهي والتالف</span>
-                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-rose-400 transition-colors">
-                    سجل الاستهلاك والهدر ({transactions.length})
-                  </h3>
-                </div>
-                <div className="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform">
-                  <TrendingDown className="w-5 h-5" />
-                </div>
-              </button>
-
-              {/* Card 4: النواقص والمطلوب شراؤه */}
-              <button
-                onClick={() => setActiveTab('shortages')}
-                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
-              >
-                <div>
-                  <span className="text-xs text-slate-400 block font-medium">المواد المنخفضة والنافدة</span>
-                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-400 transition-colors">
-                    النواقص والمطلوب شراؤه ({shortageItems.length})
-                  </h3>
-                </div>
-                <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
-                  <AlertTriangle className="w-5 h-5" />
-                </div>
-              </button>
-            </div>
-
-            {/* Alert Banner for Low / Out of stock items (Note 1) */}
-            {shortageItems.length > 0 && (
-              <div className="bg-amber-950/40 border border-amber-500/40 p-4 rounded-2xl shadow-lg flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-center sm:text-right">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-                    <AlertTriangle className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-bold text-sm sm:text-base text-amber-300">
-                    يوجد {shortageItems.length} صنف بحاجة للشراء والتخزين
-                  </h3>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <button
-                    onClick={() => setActiveTab('shortages')}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md transition-colors"
-                  >
-                    عرض قائمة النواقص
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Two Columns: Recent Purchases vs Recent Usage (Note 2) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
