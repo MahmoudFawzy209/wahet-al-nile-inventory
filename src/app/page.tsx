@@ -472,7 +472,7 @@ export default function InventoryDashboard() {
                 </span>
               </div>
               <p className="text-xs text-amber-500/90 font-bold">
-                للمأكولات اليمنية
+                المندي والمأكولات اليمنية الأصيلة
               </p>
             </div>
           </div>
@@ -504,7 +504,7 @@ export default function InventoryDashboard() {
       {/* Print View Header */}
       <div className="hidden print-only p-6 border-b-2 border-black text-black">
         <h1 className="text-2xl font-black text-center mb-1">
-          برنامج إدارة مخزون مطعم واحة النيل - للمأكولات اليمنية
+          برنامج إدارة مخزون مطعم واحة النيل - المندي والمأكولات اليمنية الأصيلة
         </h1>
         <p className="text-xs text-center text-gray-700">
           تاريخ الطباعة: {new Date().toLocaleString('ar-EG')} | فرع الكورنيش الغربي - نادي النيل - سوهاج
@@ -1831,7 +1831,7 @@ export default function InventoryDashboard() {
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 py-4 px-4 text-center text-xs text-slate-500 no-print">
         <p>
-          برنامج إدارة مخزون مطعم واحة النيل • للمأكولات اليمنية • فرع سوهاج (الكورنيش الغربي - نادي النيل) • متوافق مع الكمبيوتر والموبايل
+          برنامج إدارة مخزون مطعم واحة النيل • المندي والمأكولات اليمنية الأصيلة • فرع سوهاج (الكورنيش الغربي - نادي النيل) • متوافق مع الكمبيوتر والموبايل
         </p>
       </footer>
     </div>
