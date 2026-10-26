@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
 
       sheet.mergeCells('A3:M3');
       const statsCell = sheet.getCell('A3');
-      statsCell.value = `إجمالي الأصناف: ${totalItemsCount} | أصناف منخفضة: ${lowStockCount} | أصناف نافدة: ${outOfStockCount} | إجمالي القيمة التقديرية للمخزون: ${totalEstimatedValue.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م`;
+      statsCell.value = `إجمالي الأصناف: ${totalItemsCount} | أصناف منخفضة: ${lowStockCount} | أصناف نافدة: ${outOfStockCount} | إجمالي القيمة التقديرية للمخزون: ${totalEstimatedValue.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج`;
       statsCell.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FF0F172A' } };
       statsCell.alignment = { horizontal: 'center', vertical: 'middle' };
       statsCell.fill = {
@@ -209,13 +209,13 @@ export async function GET(request: NextRequest) {
 
         // Average unit price
         if (item.avgUnitPrice > 0) {
-          row.getCell(8).numFmt = '#,##0.00 "ج.م"';
+          row.getCell(8).numFmt = '#,##0.00 "ج"';
         }
         row.getCell(8).alignment = { horizontal: 'center', vertical: 'middle' };
 
         // Estimated value
         if (estValue !== null) {
-          row.getCell(9).numFmt = '#,##0.00 "ج.م"';
+          row.getCell(9).numFmt = '#,##0.00 "ج"';
         }
         row.getCell(9).alignment = { horizontal: 'center', vertical: 'middle' };
 
@@ -264,7 +264,7 @@ export async function GET(request: NextRequest) {
       totalRow.getCell(2).value = 'الإجمالي العام للمخزون';
       totalRow.getCell(2).font = { bold: true };
       totalRow.getCell(9).value = totalEstimatedValue;
-      totalRow.getCell(9).numFmt = '#,##0.00 "ج.م"';
+      totalRow.getCell(9).numFmt = '#,##0.00 "ج"';
       totalRow.getCell(9).font = { bold: true };
       totalRow.height = 26;
 
@@ -370,8 +370,8 @@ export async function GET(request: NextRequest) {
         row.getCell(1).alignment = { horizontal: 'center' };
         row.getCell(2).alignment = { horizontal: 'right' };
         row.getCell(3).alignment = { horizontal: 'center' };
-        row.getCell(4).numFmt = '#,##0.00 "ج.م"';
-        row.getCell(5).numFmt = '#,##0.00 "ج.م"';
+        row.getCell(4).numFmt = '#,##0.00 "ج"';
+        row.getCell(5).numFmt = '#,##0.00 "ج"';
         row.getCell(6).alignment = { horizontal: 'center' };
         row.getCell(7).alignment = { horizontal: 'right' };
       });

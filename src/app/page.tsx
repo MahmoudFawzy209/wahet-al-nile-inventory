@@ -14,19 +14,14 @@ import {
   RefreshCw,
   Edit2,
   Trash2,
-  DollarSign,
-  Calendar,
   Layers,
   CheckCircle2,
   X,
-  FileText,
-  Clock,
-  ChevronDown,
-  Filter,
-  Info,
   Download,
   Laptop,
-  Smartphone
+  Smartphone,
+  Info,
+  ChevronLeft
 } from 'lucide-react';
 
 interface Category {
@@ -76,7 +71,7 @@ interface StockTransaction {
 
 export default function InventoryDashboard() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'items' | 'purchases' | 'usage' | 'shortages'>('dashboard');
-  
+
   // Data State
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -99,11 +94,7 @@ export default function InventoryDashboard() {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
 
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-  const [selectedItemForPurchase, setSelectedItemForPurchase] = useState<string>('');
-
   const [showUsageModal, setShowUsageModal] = useState(false);
-  const [selectedItemForUsage, setSelectedItemForUsage] = useState<string>('');
-
   const [showExportModal, setShowExportModal] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [alertMessage, setAlertMessage] = useState<{ text: string; type: 'success' | 'error' | 'warning' } | null>(null);
@@ -140,7 +131,7 @@ export default function InventoryDashboard() {
     itemId: '',
     quantity: '',
     type: 'USAGE',
-    reason: 'استخدام مطبخ وطهي وجبات',
+    reason: 'استخدام مطبخ',
     date: new Date().toISOString().split('T')[0],
     notes: '',
     recordedBy: 'مدير المخزن'
@@ -274,7 +265,7 @@ export default function InventoryDashboard() {
         throw new Error(data.error || 'فشلت العملية');
       }
 
-      showAlert(editingItem ? 'تم تحديث بيانات المادة بنجاح' : 'تم إضافة المادة الجديدة للمخزن بنجاح', 'success');
+      showAlert(editingItem ? 'تم تحديث بيانات الصنف بنجاح' : 'تم إضافة الصنف الجديد للمخزن بنجاح', 'success');
       setShowItemModal(false);
       setEditingItem(null);
       loadData();
@@ -285,7 +276,7 @@ export default function InventoryDashboard() {
 
   // Handle Delete Item
   const handleDeleteItem = async (id: string, name: string) => {
-    if (!confirm(`هل أنت متأكد من حذف المادة "${name}" نهائياً من المخزن؟`)) return;
+    if (!confirm(`هل أنت متأكد من حذف الصنف "${name}" نهائياً من المخزن؟`)) return;
     try {
       const res = await fetch(`/api/inventory?id=${id}`, { method: 'DELETE' });
       if (!res.ok) {
@@ -342,7 +333,7 @@ export default function InventoryDashboard() {
       const totalP = Number(purchaseForm.totalPrice) || qty * unitP;
 
       if (!purchaseForm.itemId || qty <= 0 || unitP < 0) {
-        showAlert('يرجى تحديد المادة وإدخال كمية وسعر صحيحين', 'warning');
+        showAlert('يرجى تحديد الصنف وإدخال كمية وسعر صحيحين', 'warning');
         return;
       }
 
@@ -360,7 +351,7 @@ export default function InventoryDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'فشل تسجيل الشراء');
 
-      showAlert('تم تسجيل الشراء وإضافة الكمية للمخزن وتحديث متوسط السعر بنجاح', 'success');
+      showAlert('تم تسجيل الشراء وإضافة الكمية للمخزن بنجاح', 'success');
       setShowPurchaseModal(false);
       setPurchaseForm({
         itemId: '',
@@ -383,7 +374,7 @@ export default function InventoryDashboard() {
     try {
       const qty = Number(usageForm.quantity);
       if (!usageForm.itemId || qty <= 0) {
-        showAlert('يرجى اختيار المادة وتحديد كمية خصم صحيحة', 'warning');
+        showAlert('يرجى اختيار الصنف وتحديد كمية خصم صحيحة', 'warning');
         return;
       }
 
@@ -413,7 +404,7 @@ export default function InventoryDashboard() {
         itemId: '',
         quantity: '',
         type: 'USAGE',
-        reason: 'استخدام مطبخ وطهي وجبات',
+        reason: 'استخدام مطبخ',
         date: new Date().toISOString().split('T')[0],
         notes: '',
         recordedBy: 'مدير المخزن'
@@ -465,7 +456,7 @@ export default function InventoryDashboard() {
         </div>
       )}
 
-      {/* Main Header */}
+      {/* Main Header (Cleaned up as requested in Note 1, 5, 6) */}
       <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-xl no-print">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
@@ -473,19 +464,21 @@ export default function InventoryDashboard() {
               <Package className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
-                <span>إدارة مخزون مطعم المندي والمأكولات اليمنية</span>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                  برنامج إدارة مخزون مطعم واحة النيل
+                </h1>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
                   فرع سوهاج
                 </span>
-              </h1>
-              <p className="text-xs text-slate-400">
-                برنامج عملي وسريع لإدارة وتتبع المواد الخام والمشتريات والاستهلاك والتقارير
+              </div>
+              <p className="text-xs text-amber-500/90 font-bold">
+                للمأكولات اليمنية
               </p>
             </div>
           </div>
 
-          {/* Action Buttons Toolbar */}
+          {/* Action Toolbar in Header (Cleaned: Only Install PWA + Refresh) */}
           <div className="flex items-center flex-wrap gap-2.5">
             {!isInstalled && (
               <button
@@ -497,56 +490,10 @@ export default function InventoryDashboard() {
                 <span>تثبيت البرنامج على الجهاز</span>
               </button>
             )}
-            <button
-              onClick={() => {
-                setPurchaseForm((prev) => ({ ...prev, itemId: items[0]?.id || '' }));
-                setShowPurchaseModal(true);
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/40 transition-all active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span>تسجيل مشتريات</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setUsageForm((prev) => ({ ...prev, itemId: items[0]?.id || '' }));
-                setShowUsageModal(true);
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-950/40 transition-all active:scale-95"
-            >
-              <Minus className="w-4 h-4" />
-              <span>تسجيل استخدام / تالف</span>
-            </button>
-
-            <button
-              onClick={openAddModal}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-slate-950 shadow-md shadow-amber-950/40 transition-all active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span>إضافة مادة</span>
-            </button>
-
-            <button
-              onClick={() => setShowExportModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 shadow-md transition-all active:scale-95"
-              title="تصدير بيانات المخزون إلى Excel بصيغة .xlsx"
-            >
-              <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-              <span>تصدير Excel</span>
-            </button>
-
-            <button
-              onClick={() => window.print()}
-              className="p-2 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700"
-              title="طباعة التقرير الحالي على ورق A4"
-            >
-              <Printer className="w-4 h-4" />
-            </button>
 
             <button
               onClick={loadData}
-              className="p-2 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700"
+              className="p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
               title="تحديث البيانات"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -554,11 +501,11 @@ export default function InventoryDashboard() {
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800 flex overflow-x-auto gap-2 py-1 scrollbar-none">
+        {/* Navigation Tabs Bar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800 flex overflow-x-auto gap-2 py-1.5 scrollbar-none">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
+            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
               activeTab === 'dashboard'
                 ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
                 : 'text-slate-400 hover:text-slate-200'
@@ -570,7 +517,7 @@ export default function InventoryDashboard() {
 
           <button
             onClick={() => setActiveTab('items')}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
+            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
               activeTab === 'items'
                 ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
                 : 'text-slate-400 hover:text-slate-200'
@@ -581,20 +528,8 @@ export default function InventoryDashboard() {
           </button>
 
           <button
-            onClick={() => setActiveTab('shortages')}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
-              activeTab === 'shortages'
-                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            <span>النواقص والمطلوب شراؤه ({shortageItems.length})</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab('purchases')}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
+            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
               activeTab === 'purchases'
                 ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
                 : 'text-slate-400 hover:text-slate-200'
@@ -606,22 +541,34 @@ export default function InventoryDashboard() {
 
           <button
             onClick={() => setActiveTab('usage')}
-            className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
+            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
               activeTab === 'usage'
                 ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
             <TrendingDown className="w-4 h-4 text-rose-400" />
-            <span>سجل الاستهلاك والتالف ({transactions.length})</span>
+            <span>سجل الاستهلاك والهدر ({transactions.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('shortages')}
+            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
+              activeTab === 'shortages'
+                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4 text-amber-500" />
+            <span>النواقص والمطلوب شراؤه ({shortageItems.length})</span>
           </button>
         </div>
       </header>
 
-      {/* Print View Header (Visible ONLY when printing) */}
+      {/* Print View Header */}
       <div className="hidden print-only p-6 border-b-2 border-black text-black">
         <h1 className="text-2xl font-black text-center mb-1">
-          تقرير مخزون مطعم المندي والمأكولات اليمنية
+          برنامج إدارة مخزون مطعم واحة النيل - للمأكولات اليمنية
         </h1>
         <p className="text-xs text-center text-gray-700">
           تاريخ الطباعة: {new Date().toLocaleString('ar-EG')} | فرع الكورنيش الغربي - نادي النيل - سوهاج
@@ -635,118 +582,99 @@ export default function InventoryDashboard() {
         {/* ========================================================= */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
-            {/* Metric KPI Cards */}
+            {/* 4 Clean Navigation Cards replacing old KPI cards (Note 5) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">إجمالي أصناف المخزن</span>
-                    <span className="text-3xl font-black text-white mt-1 block">{stats.totalItems}</span>
-                  </div>
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-                    <Package className="w-6 h-6" />
-                  </div>
+              {/* Card 1: جدول المخزون */}
+              <button
+                onClick={() => setActiveTab('items')}
+                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
+              >
+                <div>
+                  <span className="text-xs text-slate-400 block font-medium">عرض وإدارة المواد</span>
+                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-400 transition-colors">
+                    جدول المخزون ({items.length})
+                  </h3>
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-                  <span>المواد المتوفرة بأمان:</span>
-                  <span className="font-bold text-emerald-400">
-                    {stats.totalItems - stats.lowStockCount - stats.outOfStockCount} صنف
-                  </span>
+                <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                  <Package className="w-5 h-5" />
                 </div>
-              </div>
+              </button>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">مواد أوشكت على النفاد</span>
-                    <span className="text-3xl font-black text-amber-400 mt-1 block">{stats.lowStockCount}</span>
-                  </div>
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-                    <AlertTriangle className="w-6 h-6" />
-                  </div>
+              {/* Card 2: سجل المشتريات */}
+              <button
+                onClick={() => setActiveTab('purchases')}
+                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-emerald-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
+              >
+                <div>
+                  <span className="text-xs text-slate-400 block font-medium">فواتير وتوريدات الشراء</span>
+                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-emerald-400 transition-colors">
+                    سجل المشتريات ({purchases.length})
+                  </h3>
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-                  <span>تنبيه الحد الأدنى:</span>
-                  <span className="font-bold text-amber-400">تستوجب الشراء قريباً</span>
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                  <ShoppingCart className="w-5 h-5" />
                 </div>
-              </div>
+              </button>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">مواد نافدة تماماً (رصيد 0)</span>
-                    <span className="text-3xl font-black text-rose-400 mt-1 block">{stats.outOfStockCount}</span>
-                  </div>
-                  <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
-                    <TrendingDown className="w-6 h-6" />
-                  </div>
+              {/* Card 3: سجل الاستهلاك والهدر */}
+              <button
+                onClick={() => setActiveTab('usage')}
+                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-rose-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
+              >
+                <div>
+                  <span className="text-xs text-slate-400 block font-medium">المنصرف للطهي والتالف</span>
+                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-rose-400 transition-colors">
+                    سجل الاستهلاك والهدر ({transactions.length})
+                  </h3>
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-                  <span>حالة المطبخ:</span>
-                  <span className="font-bold text-rose-400">شراء عاجل مطلوب</span>
+                <div className="w-11 h-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform">
+                  <TrendingDown className="w-5 h-5" />
                 </div>
-              </div>
+              </button>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">القيمة التقديرية للمخزون</span>
-                    <span className="text-2xl sm:text-3xl font-black text-emerald-400 mt-1 block">
-                      {stats.totalStockValue.toLocaleString('ar-EG', {
-                        minimumFractionDigits: 1,
-                        maximumFractionDigits: 1
-                      })}{' '}
-                      <span className="text-xs text-slate-400 font-normal">ج.م</span>
-                    </span>
-                  </div>
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                    <DollarSign className="w-6 h-6" />
-                  </div>
+              {/* Card 4: النواقص والمطلوب شراؤه */}
+              <button
+                onClick={() => setActiveTab('shortages')}
+                className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/50 p-5 rounded-2xl shadow-lg transition-all text-right group flex items-center justify-between"
+              >
+                <div>
+                  <span className="text-xs text-slate-400 block font-medium">المواد المنخفضة والنافدة</span>
+                  <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-400 transition-colors">
+                    النواقص والمطلوب شراؤه ({shortageItems.length})
+                  </h3>
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
-                  <span>محسوبة بناءً على:</span>
-                  <span className="font-bold text-slate-300">متوسط أسعار الشراء</span>
+                <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                  <AlertTriangle className="w-5 h-5" />
                 </div>
-              </div>
+              </button>
             </div>
 
-            {/* Alert Banner for Low / Out of stock items */}
+            {/* Alert Banner for Low / Out of stock items (Note 1) */}
             {shortageItems.length > 0 && (
-              <div className="bg-amber-950/40 border-2 border-amber-500/50 p-5 rounded-2xl shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-                    <AlertTriangle className="w-5 h-5" />
+              <div className="bg-amber-950/40 border border-amber-500/40 p-4 rounded-2xl shadow-lg flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-center sm:text-right">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                    <AlertTriangle className="w-4 h-4" />
                   </div>
-                  <div>
-                    <h3 className="font-black text-sm sm:text-base text-amber-300">
-                      يوجد {shortageItems.length} صنف بحاجة للشراء وإعادة التموين فوراً
-                    </h3>
-                    <p className="text-xs text-amber-200/80 mt-1">
-                      منها {shortageItems.filter((i) => i.currentStock <= 0).length} صنف رصيدها صفر في المطبخ، وباقي الأصناف وصلت لحد الأمان الأدنى.
-                    </p>
-                  </div>
+                  <h3 className="font-bold text-sm sm:text-base text-amber-300">
+                    يوجد {shortageItems.length} صنف بحاجة للشراء والتخزين
+                  </h3>
                 </div>
-                <div className="flex items-center gap-2.5 shrink-0">
+
+                <div className="flex items-center gap-2.5">
                   <button
                     onClick={() => setActiveTab('shortages')}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md transition-colors"
                   >
                     عرض قائمة النواقص
-                  </button>
-                  <button
-                    onClick={() => handleDownloadExcel('inventory')}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5" />
-                    <span>تصدير Excel</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Two Columns: Recent Purchases vs Recent Usage */}
+            {/* Two Columns: Recent Purchases vs Recent Usage (Note 2) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Purchases */}
+              {/* Recent Purchases (No sub-lines under item names) */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
@@ -768,20 +696,15 @@ export default function InventoryDashboard() {
                     {purchases.slice(0, 5).map((p) => (
                       <div
                         key={p.id}
-                        className="bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl flex items-center justify-between text-xs"
+                        className="bg-slate-950/60 border border-slate-800/80 p-3.5 rounded-xl flex items-center justify-between text-xs"
                       >
-                        <div>
-                          <span className="font-bold text-slate-200 block">{p.item?.name}</span>
-                          <span className="text-[11px] text-slate-400">
-                            {new Date(p.purchaseDate).toLocaleDateString('ar-EG')} • {p.supplier || 'مورد محلي'}
-                          </span>
-                        </div>
-                        <div className="text-left">
-                          <span className="font-black text-emerald-400 block">
+                        <span className="font-bold text-slate-200">{p.item?.name}</span>
+                        <div className="text-left flex items-center gap-3">
+                          <span className="font-black text-emerald-400">
                             +{p.quantity} {p.item?.unit}
                           </span>
-                          <span className="text-[10px] text-slate-400">
-                            {p.totalPrice.toLocaleString('ar-EG')} ج.م
+                          <span className="font-bold text-slate-300">
+                            {p.totalPrice.toLocaleString('ar-EG')} ج
                           </span>
                         </div>
                       </div>
@@ -790,7 +713,7 @@ export default function InventoryDashboard() {
                 )}
               </div>
 
-              {/* Recent Usage & Waste */}
+              {/* Recent Usage & Waste (No sub-lines under item names) */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
@@ -812,31 +735,23 @@ export default function InventoryDashboard() {
                     {transactions.slice(0, 5).map((t) => (
                       <div
                         key={t.id}
-                        className="bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl flex items-center justify-between text-xs"
+                        className="bg-slate-950/60 border border-slate-800/80 p-3.5 rounded-xl flex items-center justify-between text-xs"
                       >
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-slate-200">{t.item?.name}</span>
-                            <span
-                              className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
-                                t.type === 'WASTE'
-                                  ? 'bg-rose-950 text-rose-400 border border-rose-800'
-                                  : 'bg-blue-950 text-blue-400 border border-blue-800'
-                              }`}
-                            >
-                              {t.type === 'WASTE' ? 'تالف' : 'مطبخ'}
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-slate-400 block mt-0.5">{t.reason}</span>
-                        </div>
-                        <div className="text-left">
-                          <span className="font-black text-rose-400 block">
-                            -{t.quantity} {t.item?.unit}
-                          </span>
-                          <span className="text-[10px] text-slate-500">
-                            {new Date(t.date).toLocaleDateString('ar-EG')}
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-200">{t.item?.name}</span>
+                          <span
+                            className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
+                              t.type === 'WASTE'
+                                ? 'bg-rose-950 text-rose-400 border border-rose-800'
+                                : 'bg-blue-950 text-blue-400 border border-blue-800'
+                            }`}
+                          >
+                            {t.type === 'WASTE' ? 'تالف' : 'مطبخ'}
                           </span>
                         </div>
+                        <span className="font-black text-rose-400">
+                          -{t.quantity} {t.item?.unit}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -851,13 +766,13 @@ export default function InventoryDashboard() {
         {/* ========================================================= */}
         {activeTab === 'items' && (
           <div className="space-y-4">
-            {/* Search and Filters Bar */}
+            {/* Search and Filters Bar with Section Toolbars (Note 6) */}
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-lg flex flex-wrap items-center justify-between gap-3">
-              <div className="flex-1 min-w-[240px] relative">
+              <div className="flex-1 min-w-[220px] relative">
                 <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="ابحث باسم المادة، المورد، أو الملاحظات..."
+                  placeholder="ابحث باسم الصنف أو المورد..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 text-white text-xs sm:text-sm pr-10 pl-4 py-2.5 rounded-xl focus:outline-none focus:border-amber-500 transition-colors"
@@ -887,20 +802,46 @@ export default function InventoryDashboard() {
                 >
                   <option value="ALL">جميع الحالات</option>
                   <option value="AVAILABLE">متوفر بأمان</option>
-                  <option value="LOW">أوشك على النفاد (منخفض)</option>
-                  <option value="OUT">نافد تماماً (رصيد 0)</option>
+                  <option value="LOW">أوشك على النفاد</option>
+                  <option value="OUT">نافد تماماً</option>
                 </select>
+
+                {/* Action Buttons in Inventory Section (Note 6) */}
+                <button
+                  onClick={openAddModal}
+                  className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-slate-950 shadow-md transition-all active:scale-95"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>إضافة صنف</span>
+                </button>
+
+                <button
+                  onClick={() => handleDownloadExcel('inventory')}
+                  className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 transition-all active:scale-95"
+                  title="تصدير جدول المخزون إلى Excel"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                  <span>تصدير Excel</span>
+                </button>
+
+                <button
+                  onClick={() => window.print()}
+                  className="p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+                  title="طباعة جدول المخزون"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
-            {/* Inventory Table Card */}
+            {/* Inventory Table Card (Cleaned item names, no sub-notes, currency is 'ج') */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-right text-xs sm:text-sm">
                   <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 text-[11px] sm:text-xs font-bold uppercase">
                     <tr>
                       <th className="py-3.5 px-4 text-center">م</th>
-                      <th className="py-3.5 px-4">اسم المادة</th>
+                      <th className="py-3.5 px-4">اسم الصنف</th>
                       <th className="py-3.5 px-4">التصنيف</th>
                       <th className="py-3.5 px-4 text-center">الوحدة</th>
                       <th className="py-3.5 px-4 text-center">الرصيد الحالي</th>
@@ -916,7 +857,7 @@ export default function InventoryDashboard() {
                     {filteredItems.length === 0 ? (
                       <tr>
                         <td colSpan={11} className="text-center py-12 text-slate-500">
-                          لا توجد مواد مطابقة للبحث أو التصفية الحالية.
+                          لا توجد أصناف مطابقة للبحث أو التصفية الحالية.
                         </td>
                       </tr>
                     ) : (
@@ -934,13 +875,8 @@ export default function InventoryDashboard() {
                             }`}
                           >
                             <td className="py-3 px-4 text-center text-slate-500">{idx + 1}</td>
-                            <td className="py-3 px-4">
-                              <span className="font-bold text-white block">{item.name}</span>
-                              {item.notes && <span className="text-[11px] text-slate-400 block line-clamp-1">{item.notes}</span>}
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className="text-xs text-slate-300">{item.category?.name}</span>
-                            </td>
+                            <td className="py-3 px-4 font-bold text-white">{item.name}</td>
+                            <td className="py-3 px-4 text-slate-300">{item.category?.name}</td>
                             <td className="py-3 px-4 text-center">
                               <span className="text-xs font-semibold px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300">
                                 {item.unit}
@@ -968,10 +904,10 @@ export default function InventoryDashboard() {
                               )}
                             </td>
                             <td className="py-3 px-4 text-center text-slate-300 font-medium">
-                              {item.avgUnitPrice > 0 ? `${item.avgUnitPrice.toLocaleString('ar-EG')} ج.م` : '—'}
+                              {item.avgUnitPrice > 0 ? `${item.avgUnitPrice.toLocaleString('ar-EG')} ج` : '—'}
                             </td>
                             <td className="py-3 px-4 text-center font-bold text-emerald-400">
-                              {estValue > 0 ? `${estValue.toLocaleString('ar-EG')} ج.م` : '—'}
+                              {estValue > 0 ? `${estValue.toLocaleString('ar-EG')} ج` : '—'}
                             </td>
                             <td className="py-3 px-4 text-center">
                               {isOut ? (
@@ -991,35 +927,15 @@ export default function InventoryDashboard() {
                             <td className="py-3 px-4 text-center no-print">
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
-                                  onClick={() => {
-                                    setPurchaseForm((prev) => ({ ...prev, itemId: item.id }));
-                                    setShowPurchaseModal(true);
-                                  }}
-                                  title="تسجيل شراء سريع"
-                                  className="p-1.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-800"
-                                >
-                                  <Plus className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setUsageForm((prev) => ({ ...prev, itemId: item.id }));
-                                    setShowUsageModal(true);
-                                  }}
-                                  title="تسجيل خصم / استخدام"
-                                  className="p-1.5 rounded-lg bg-rose-950 hover:bg-rose-900 text-rose-400 border border-rose-800"
-                                >
-                                  <Minus className="w-3.5 h-3.5" />
-                                </button>
-                                <button
                                   onClick={() => openEditModal(item)}
-                                  title="تعديل المادة"
+                                  title="تعديل الصنف"
                                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteItem(item.id, item.name)}
-                                  title="حذف"
+                                  title="حذف الصنف"
                                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-900/40 text-rose-400 border border-slate-700"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1038,7 +954,232 @@ export default function InventoryDashboard() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB 3: SHORTAGES & PURCHASE REQUISITION */}
+        {/* TAB 3: PURCHASES LOG */}
+        {/* ========================================================= */}
+        {activeTab === 'purchases' && (
+          <div className="space-y-4">
+            <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                {/* Title with estimated inventory value in parentheses (Note 5) */}
+                <h2 className="text-base sm:text-lg font-black text-emerald-400 flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>
+                    سجل فواتير وتوريدات المشتريات (
+                    {stats.totalStockValue.toLocaleString('ar-EG', {
+                      minimumFractionDigits: 1,
+                      maximumFractionDigits: 1
+                    })}{' '}
+                    ج )
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  كافة عمليات الشراء الواردة للمخزن مضافة للرصيد وتاريخها والموردون.
+                </p>
+              </div>
+
+              {/* Action Toolbar in Purchases Section (Note 6) */}
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => {
+                    setPurchaseForm((prev) => ({
+                      ...prev,
+                      itemId: items[0]?.id || '',
+                      supplier: '',
+                      notes: ''
+                    }));
+                    setShowPurchaseModal(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md flex items-center gap-1.5 transition-all active:scale-95"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>تسجيل فاتورة شراء جديدة</span>
+                </button>
+
+                <button
+                  onClick={() => handleDownloadExcel('purchases')}
+                  className="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 transition-all active:scale-95"
+                  title="تصدير سجل المشتريات إلى Excel"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>تصدير Excel</span>
+                </button>
+
+                <button
+                  onClick={() => window.print()}
+                  className="p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+                  title="طباعة سجل المشتريات"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-right text-xs sm:text-sm">
+                  <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 text-[11px] sm:text-xs font-bold uppercase">
+                    <tr>
+                      <th className="py-3.5 px-4 text-center">م</th>
+                      <th className="py-3.5 px-4">اسم الصنف</th>
+                      <th className="py-3.5 px-4 text-center">الكمية المشتراة</th>
+                      <th className="py-3.5 px-4 text-center">سعر الوحدة</th>
+                      <th className="py-3.5 px-4 text-center">الإجمالي</th>
+                      <th className="py-3.5 px-4 text-center">تاريخ الشراء</th>
+                      <th className="py-3.5 px-4">اسم المورد</th>
+                      <th className="py-3.5 px-4">ملاحظات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {purchases.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-12 text-slate-500">
+                          لا توجد مشتريات مسجلة بعد.
+                        </td>
+                      </tr>
+                    ) : (
+                      purchases.map((p, idx) => (
+                        <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="py-3 px-4 text-center text-slate-500">{idx + 1}</td>
+                          <td className="py-3 px-4 font-bold text-white">{p.item?.name}</td>
+                          <td className="py-3 px-4 text-center font-bold text-emerald-400">
+                            +{p.quantity} {p.item?.unit}
+                          </td>
+                          <td className="py-3 px-4 text-center text-slate-300">
+                            {p.unitPrice.toLocaleString('ar-EG')} ج
+                          </td>
+                          <td className="py-3 px-4 text-center font-black text-white">
+                            {p.totalPrice.toLocaleString('ar-EG')} ج
+                          </td>
+                          <td className="py-3 px-4 text-center text-slate-400">
+                            {new Date(p.purchaseDate).toLocaleDateString('ar-EG')}
+                          </td>
+                          <td className="py-3 px-4 text-slate-300">{p.supplier || '—'}</td>
+                          <td className="py-3 px-4 text-slate-400 text-xs">{p.notes || '—'}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* TAB 4: USAGE & WASTE LOG */}
+        {/* ========================================================= */}
+        {activeTab === 'usage' && (
+          <div className="space-y-4">
+            <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                {/* Title updated as requested in Note 4 */}
+                <h2 className="text-base sm:text-lg font-black text-rose-400 flex items-center gap-2">
+                  <TrendingDown className="w-5 h-5" />
+                  <span>سجل الاستهلاك في المطبخ والهدر</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  كافة المواد المخصومة من رصيد المخزن للطهي اليومي أو بسبب التلف والهدر.
+                </p>
+              </div>
+
+              {/* Action Toolbar in Usage Section (Note 6) */}
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => {
+                    setUsageForm((prev) => ({
+                      ...prev,
+                      itemId: items[0]?.id || '',
+                      reason: 'استخدام مطبخ',
+                      notes: ''
+                    }));
+                    setShowUsageModal(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md flex items-center gap-1.5 transition-all active:scale-95"
+                >
+                  <Minus className="w-4 h-4" />
+                  <span>تسجيل خصم جديد</span>
+                </button>
+
+                <button
+                  onClick={() => handleDownloadExcel('usage')}
+                  className="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 transition-all active:scale-95"
+                  title="تصدير سجل الاستهلاك إلى Excel"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>تصدير Excel</span>
+                </button>
+
+                <button
+                  onClick={() => window.print()}
+                  className="p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+                  title="طباعة سجل الاستهلاك"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-right text-xs sm:text-sm">
+                  <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 text-[11px] sm:text-xs font-bold uppercase">
+                    <tr>
+                      <th className="py-3.5 px-4 text-center">م</th>
+                      <th className="py-3.5 px-4">اسم الصنف</th>
+                      <th className="py-3.5 px-4 text-center">الكمية المخصومة</th>
+                      <th className="py-3.5 px-4 text-center">نوع الخصم</th>
+                      <th className="py-3.5 px-4">السبب والبيان</th>
+                      <th className="py-3.5 px-4 text-center">التاريخ</th>
+                      <th className="py-3.5 px-4 text-center">المسؤول</th>
+                      <th className="py-3.5 px-4">ملاحظات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {transactions.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-12 text-slate-500">
+                          لا توجد حركات استهلاك مسجلة بعد.
+                        </td>
+                      </tr>
+                    ) : (
+                      transactions.map((t, idx) => (
+                        <tr key={t.id} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="py-3 px-4 text-center text-slate-500">{idx + 1}</td>
+                          <td className="py-3 px-4 font-bold text-white">{t.item?.name}</td>
+                          <td className="py-3 px-4 text-center font-bold text-rose-400">
+                            -{t.quantity} {t.item?.unit}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                t.type === 'WASTE'
+                                  ? 'bg-rose-950 text-rose-400 border border-rose-800'
+                                  : 'bg-blue-950 text-blue-400 border border-blue-800'
+                              }`}
+                            >
+                              {t.type === 'WASTE' ? 'تالف / هدر' : 'استهلاك مطبخ'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-slate-300 font-medium">
+                            {t.type === 'USAGE' && t.reason === 'استخدام مطبخ' ? 'استخدام مطبخ' : t.reason}
+                          </td>
+                          <td className="py-3 px-4 text-center text-slate-400">
+                            {new Date(t.date).toLocaleDateString('ar-EG')}
+                          </td>
+                          <td className="py-3 px-4 text-center text-slate-300">{t.recordedBy || 'المدير'}</td>
+                          <td className="py-3 px-4 text-slate-400 text-xs">{t.notes || '—'}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* TAB 5: SHORTAGES & REQUISITION */}
         {/* ========================================================= */}
         {activeTab === 'shortages' && (
           <div className="space-y-4">
@@ -1053,13 +1194,23 @@ export default function InventoryDashboard() {
                 </p>
               </div>
 
-              <button
-                onClick={() => handleDownloadExcel('inventory')}
-                className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md flex items-center gap-2"
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                <span>تصدير قائمة النواقص إلى Excel</span>
-              </button>
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => handleDownloadExcel('inventory')}
+                  className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md flex items-center gap-2 transition-all active:scale-95"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>تصدير قائمة النواقص إلى Excel</span>
+                </button>
+
+                <button
+                  onClick={() => window.print()}
+                  className="p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors"
+                  title="طباعة قائمة النواقص"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {shortageItems.length === 0 ? (
@@ -1067,7 +1218,7 @@ export default function InventoryDashboard() {
                 <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
                 <h3 className="text-base font-bold text-white">المخزن في حالة ممتازة!</h3>
                 <p className="text-xs text-slate-400 mt-1">
-                  لا توجد أي مادة وصلت لحد الخطر أو أوشكت على النفاد حالياً.
+                  لا توجد أي أصناف وصلت لحد الخطر أو أوشكت على النفاد حالياً.
                 </p>
               </div>
             ) : (
@@ -1124,7 +1275,7 @@ export default function InventoryDashboard() {
                       <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
                         <span>التكلفة التقديرية:</span>
                         <span className="font-bold text-white">
-                          {estimatedCost > 0 ? `${estimatedCost.toLocaleString('ar-EG')} ج.م` : 'غير محدد'}
+                          {estimatedCost > 0 ? `${estimatedCost.toLocaleString('ar-EG')} ج` : 'غير محدد'}
                         </span>
                       </div>
 
@@ -1142,14 +1293,14 @@ export default function InventoryDashboard() {
                             totalPrice: (needed * item.avgUnitPrice).toString(),
                             supplier: item.lastSupplier || '',
                             purchaseDate: new Date().toISOString().split('T')[0],
-                            notes: 'شراء عاجل لتغطية النواقص'
+                            notes: ''
                           });
                           setShowPurchaseModal(true);
                         }}
                         className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md"
                       >
                         <ShoppingCart className="w-3.5 h-3.5" />
-                        <span>تسجيل شراء هذه المادة الآن</span>
+                        <span>تسجيل شراء هذا الصنف الآن</span>
                       </button>
                     </div>
                   );
@@ -1158,193 +1309,17 @@ export default function InventoryDashboard() {
             )}
           </div>
         )}
-
-        {/* ========================================================= */}
-        {/* TAB 4: PURCHASES LOG */}
-        {/* ========================================================= */}
-        {activeTab === 'purchases' && (
-          <div className="space-y-4">
-            <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-emerald-400 flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5" />
-                  <span>سجل فواتير وتوريدات المشتريات</span>
-                </h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  كافة عمليات الشراء الواردة للمخزن مضافة للرصيد وتاريخها والموردون.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <button
-                  onClick={() => setShowPurchaseModal(true)}
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md flex items-center gap-1.5"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>تسجيل فاتورة شراء جديدة</span>
-                </button>
-                <button
-                  onClick={() => handleDownloadExcel('purchases')}
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5"
-                >
-                  <FileSpreadsheet className="w-4 h-4" />
-                  <span>تصدير Excel</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-right text-xs sm:text-sm">
-                  <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 text-[11px] sm:text-xs font-bold uppercase">
-                    <tr>
-                      <th className="py-3.5 px-4 text-center">م</th>
-                      <th className="py-3.5 px-4">اسم المادة</th>
-                      <th className="py-3.5 px-4 text-center">الكمية المشتراة</th>
-                      <th className="py-3.5 px-4 text-center">سعر الوحدة</th>
-                      <th className="py-3.5 px-4 text-center">الإجمالي</th>
-                      <th className="py-3.5 px-4 text-center">تاريخ الشراء</th>
-                      <th className="py-3.5 px-4">اسم المورد</th>
-                      <th className="py-3.5 px-4">ملاحظات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/60">
-                    {purchases.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="text-center py-12 text-slate-500">
-                          لا توجد مشتريات مسجلة بعد.
-                        </td>
-                      </tr>
-                    ) : (
-                      purchases.map((p, idx) => (
-                        <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3 px-4 text-center text-slate-500">{idx + 1}</td>
-                          <td className="py-3 px-4 font-bold text-white">{p.item?.name}</td>
-                          <td className="py-3 px-4 text-center font-bold text-emerald-400">
-                            +{p.quantity} {p.item?.unit}
-                          </td>
-                          <td className="py-3 px-4 text-center text-slate-300">
-                            {p.unitPrice.toLocaleString('ar-EG')} ج.م
-                          </td>
-                          <td className="py-3 px-4 text-center font-black text-white">
-                            {p.totalPrice.toLocaleString('ar-EG')} ج.م
-                          </td>
-                          <td className="py-3 px-4 text-center text-slate-400">
-                            {new Date(p.purchaseDate).toLocaleDateString('ar-EG')}
-                          </td>
-                          <td className="py-3 px-4 text-slate-300">{p.supplier || '—'}</td>
-                          <td className="py-3 px-4 text-slate-400 text-xs">{p.notes || '—'}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================= */}
-        {/* TAB 5: USAGE & WASTE LOG */}
-        {/* ========================================================= */}
-        {activeTab === 'usage' && (
-          <div className="space-y-4">
-            <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-rose-400 flex items-center gap-2">
-                  <TrendingDown className="w-5 h-5" />
-                  <span>سجل الاستهلاك المنصرف للمطبخ والتالف</span>
-                </h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  تتبع دقيق لكافة المواد المخصومة من رصيد المخزن للطهي اليومي أو بسبب التلف والهدر.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <button
-                  onClick={() => setShowUsageModal(true)}
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md flex items-center gap-1.5"
-                >
-                  <Minus className="w-4 h-4" />
-                  <span>تسجيل خصم جديد</span>
-                </button>
-                <button
-                  onClick={() => handleDownloadExcel('usage')}
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5"
-                >
-                  <FileSpreadsheet className="w-4 h-4" />
-                  <span>تصدير Excel</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-right text-xs sm:text-sm">
-                  <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 text-[11px] sm:text-xs font-bold uppercase">
-                    <tr>
-                      <th className="py-3.5 px-4 text-center">م</th>
-                      <th className="py-3.5 px-4">اسم المادة</th>
-                      <th className="py-3.5 px-4 text-center">الكمية المخصومة</th>
-                      <th className="py-3.5 px-4 text-center">نوع الخصم</th>
-                      <th className="py-3.5 px-4">السبب والبيان</th>
-                      <th className="py-3.5 px-4 text-center">التاريخ</th>
-                      <th className="py-3.5 px-4 text-center">المسؤول</th>
-                      <th className="py-3.5 px-4">ملاحظات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/60">
-                    {transactions.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="text-center py-12 text-slate-500">
-                          لا توجد حركات استهلاك مسجلة بعد.
-                        </td>
-                      </tr>
-                    ) : (
-                      transactions.map((t, idx) => (
-                        <tr key={t.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3 px-4 text-center text-slate-500">{idx + 1}</td>
-                          <td className="py-3 px-4 font-bold text-white">{t.item?.name}</td>
-                          <td className="py-3 px-4 text-center font-bold text-rose-400">
-                            -{t.quantity} {t.item?.unit}
-                          </td>
-                          <td className="py-3 px-4 text-center">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                t.type === 'WASTE'
-                                  ? 'bg-rose-950 text-rose-400 border border-rose-800'
-                                  : 'bg-blue-950 text-blue-400 border border-blue-800'
-                              }`}
-                            >
-                              {t.type === 'WASTE' ? 'تالف / هدر' : 'استهلاك مطبخ'}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-slate-300 font-medium">{t.reason}</td>
-                          <td className="py-3 px-4 text-center text-slate-400">
-                            {new Date(t.date).toLocaleDateString('ar-EG')}
-                          </td>
-                          <td className="py-3 px-4 text-center text-slate-300">{t.recordedBy || 'المدير'}</td>
-                          <td className="py-3 px-4 text-slate-400 text-xs">{t.notes || '—'}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
 
       {/* ========================================================= */}
-      {/* MODAL 1: ADD / EDIT INVENTORY ITEM */}
+      {/* MODAL 1: ADD / EDIT INVENTORY ITEM (إضافة صنف) */}
       {/* ========================================================= */}
       {showItemModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <h3 className="font-black text-lg text-white">
-                {editingItem ? 'تعديل بيانات مادة بالمخزن' : 'إضافة مادة خام جديدة'}
+                {editingItem ? 'تعديل بيانات الصنف' : 'إضافة صنف جديد للمخزن'}
               </h3>
               <button
                 onClick={() => setShowItemModal(false)}
@@ -1357,7 +1332,7 @@ export default function InventoryDashboard() {
             <form onSubmit={handleSaveItem} className="space-y-4 text-xs sm:text-sm">
               <div>
                 <label className="block text-slate-300 font-bold mb-1.5">
-                  اسم المادة <span className="text-rose-500">*</span>
+                  اسم الصنف <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1405,7 +1380,7 @@ export default function InventoryDashboard() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1.5">الرصيد الأولي المتوفر</label>
+                  <label className="block text-slate-300 font-bold mb-1.5">الرصيد الأولي</label>
                   <input
                     type="number"
                     step="any"
@@ -1416,7 +1391,7 @@ export default function InventoryDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1.5">الحد الأدنى للتنبيه</label>
+                  <label className="block text-slate-300 font-bold mb-1.5">الحد الأدنى</label>
                   <input
                     type="number"
                     step="any"
@@ -1440,7 +1415,7 @@ export default function InventoryDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1.5">متوسط سعر الوحدة (ج.م)</label>
+                  <label className="block text-slate-300 font-bold mb-1.5">سعر الوحدة (ج)</label>
                   <input
                     type="number"
                     step="any"
@@ -1451,10 +1426,10 @@ export default function InventoryDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1.5">اسم المورد الافتراضي</label>
+                  <label className="block text-slate-300 font-bold mb-1.5">اسم المورد (اختياري)</label>
                   <input
                     type="text"
-                    placeholder="مورد اللحوم / سوق الخضار..."
+                    placeholder="يمكنك كتابة أي مورد أو تركه فارغاً"
                     value={itemForm.lastSupplier}
                     onChange={(e) => setItemForm({ ...itemForm, lastSupplier: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 text-white px-3 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
@@ -1463,12 +1438,12 @@ export default function InventoryDashboard() {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1.5">ملاحظات اختيارية</label>
+                <label className="block text-slate-300 font-bold mb-1.5">ملاحظات (اختيارية)</label>
                 <textarea
                   rows={2}
                   value={itemForm.notes}
                   onChange={(e) => setItemForm({ ...itemForm, notes: e.target.value })}
-                  placeholder="ملاحظات حول طريقة التخزين، الجودة، الاستخدام في الأطباق..."
+                  placeholder="ملاحظات اختيارية..."
                   className="w-full bg-slate-950 border border-slate-800 text-white px-3.5 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
                 />
               </div>
@@ -1485,7 +1460,7 @@ export default function InventoryDashboard() {
                   type="submit"
                   className="px-6 py-2.5 rounded-xl font-black bg-amber-600 hover:bg-amber-500 text-slate-950 shadow-lg shadow-amber-950/40"
                 >
-                  {editingItem ? 'حفظ التعديلات' : 'إضافة المادة'}
+                  {editingItem ? 'حفظ التعديلات' : 'إضافة الصنف'}
                 </button>
               </div>
             </form>
@@ -1494,7 +1469,7 @@ export default function InventoryDashboard() {
       )}
 
       {/* ========================================================= */}
-      {/* MODAL 2: RECORD NEW PURCHASE */}
+      {/* MODAL 2: RECORD NEW PURCHASE (With Add Item option) */}
       {/* ========================================================= */}
       {showPurchaseModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1516,9 +1491,24 @@ export default function InventoryDashboard() {
 
             <form onSubmit={handlePurchaseSubmit} className="space-y-4 text-xs sm:text-sm">
               <div>
-                <label className="block text-slate-300 font-bold mb-1.5">
-                  اختر المادة المشتراة <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-slate-300 font-bold">
+                    اختر الصنف <span className="text-rose-500">*</span>
+                  </label>
+                  {/* Button to directly add a new item on the fly (Note 6) */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPurchaseModal(false);
+                      openAddModal();
+                    }}
+                    className="text-amber-400 hover:text-amber-300 font-bold text-xs flex items-center gap-1 hover:underline"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ إضافة صنف جديد</span>
+                  </button>
+                </div>
+
                 <select
                   required
                   value={purchaseForm.itemId}
@@ -1534,10 +1524,10 @@ export default function InventoryDashboard() {
                   }}
                   className="w-full bg-slate-950 border border-slate-800 text-white px-3.5 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
                 >
-                  <option value="">-- اضغط لاختيار المادة --</option>
+                  <option value="">-- اضغط لاختيار الصنف --</option>
                   {items.map((i) => (
                     <option key={i.id} value={i.id}>
-                      {i.name} (الرصيد الحالي: {i.currentStock} {i.unit})
+                      {i.name} (الرصيد: {i.currentStock} {i.unit})
                     </option>
                   ))}
                 </select>
@@ -1565,7 +1555,7 @@ export default function InventoryDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1.5">سعر شراء الوحدة (ج.م)</label>
+                  <label className="block text-slate-300 font-bold mb-1.5">سعر الوحدة (ج)</label>
                   <input
                     type="number"
                     step="any"
@@ -1585,7 +1575,7 @@ export default function InventoryDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1.5">إجمالي الفاتورة (ج.م)</label>
+                  <label className="block text-slate-300 font-bold mb-1.5">إجمالي الفاتورة (ج)</label>
                   <input
                     type="number"
                     step="any"
@@ -1608,10 +1598,10 @@ export default function InventoryDashboard() {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1.5">اسم المورد أو جهة الشراء</label>
+                <label className="block text-slate-300 font-bold mb-1.5">اسم المورد (قابل للتعديل أو المسح)</label>
                 <input
                   type="text"
-                  placeholder="مثال: جزارة الأمانة، مورد البصل، سوق الجملة..."
+                  placeholder="اكتب اسم المورد أو اتركه فارغاً"
                   value={purchaseForm.supplier}
                   onChange={(e) => setPurchaseForm({ ...purchaseForm, supplier: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 text-white px-3.5 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
@@ -1619,7 +1609,7 @@ export default function InventoryDashboard() {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1.5">ملاحظات / رقم الفاتورة</label>
+                <label className="block text-slate-300 font-bold mb-1.5">ملاحظات (اختيارية)</label>
                 <input
                   type="text"
                   placeholder="ملاحظات اختيارية..."
@@ -1627,11 +1617,6 @@ export default function InventoryDashboard() {
                   onChange={(e) => setPurchaseForm({ ...purchaseForm, notes: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 text-white px-3.5 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
                 />
-              </div>
-
-              <div className="bg-emerald-950/30 border border-emerald-800/40 p-3 rounded-xl text-xs text-emerald-300 flex items-center gap-2">
-                <Info className="w-4 h-4 shrink-0 text-emerald-400" />
-                <span>سيتم إضافة الكمية تلقائياً لرصيد المخزن وإعادة احتساب متوسط سعر الوحدة.</span>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
@@ -1678,7 +1663,7 @@ export default function InventoryDashboard() {
             <form onSubmit={handleUsageSubmit} className="space-y-4 text-xs sm:text-sm">
               <div>
                 <label className="block text-slate-300 font-bold mb-1.5">
-                  اختر المادة المراد خصمها <span className="text-rose-500">*</span>
+                  اختر الصنف المراد خصمه <span className="text-rose-500">*</span>
                 </label>
                 <select
                   required
@@ -1686,7 +1671,7 @@ export default function InventoryDashboard() {
                   onChange={(e) => setUsageForm({ ...usageForm, itemId: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 text-white px-3.5 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
                 >
-                  <option value="">-- اضغط لاختيار المادة --</option>
+                  <option value="">-- اضغط لاختيار الصنف --</option>
                   {items.map((i) => (
                     <option key={i.id} value={i.id}>
                       {i.name} (المتوفر حالياً: {i.currentStock} {i.unit})
@@ -1720,12 +1705,12 @@ export default function InventoryDashboard() {
                       setUsageForm({
                         ...usageForm,
                         type: t,
-                        reason: t === 'WASTE' ? 'تالف / منتهي الصلاحية' : 'استخدام مطبخ وطهي وجبات'
+                        reason: t === 'WASTE' ? 'تالف / هدر تنظيف' : 'استخدام مطبخ'
                       });
                     }}
                     className="w-full bg-slate-950 border border-slate-800 text-white px-3 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
                   >
-                    <option value="USAGE">استخدام مطبخ وطهي</option>
+                    <option value="USAGE">استخدام مطبخ</option>
                     <option value="WASTE">تالف / هدر / كسر</option>
                     <option value="ADJUSTMENT">تسوية جرد دوري</option>
                   </select>
@@ -1739,7 +1724,7 @@ export default function InventoryDashboard() {
                 <input
                   type="text"
                   required
-                  placeholder="مثال: صُرف لطاهي المندي للغداء، عروق وتالف تنظيف..."
+                  placeholder="مثال: استخدام مطبخ، عروق وتالف تنظيف..."
                   value={usageForm.reason}
                   onChange={(e) => setUsageForm({ ...usageForm, reason: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 text-white px-3.5 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
@@ -1759,7 +1744,7 @@ export default function InventoryDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1.5">اسم المسؤول / الشيف</label>
+                  <label className="block text-slate-300 font-bold mb-1.5">المسؤول</label>
                   <input
                     type="text"
                     value={usageForm.recordedBy}
@@ -1770,10 +1755,10 @@ export default function InventoryDashboard() {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1.5">ملاحظات إضافية</label>
+                <label className="block text-slate-300 font-bold mb-1.5">ملاحظات (اختيارية)</label>
                 <input
                   type="text"
-                  placeholder="أي تفاصيل أخرى..."
+                  placeholder="ملاحظات اختيارية..."
                   value={usageForm.notes}
                   onChange={(e) => setUsageForm({ ...usageForm, notes: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 text-white px-3.5 py-2.5 rounded-xl focus:border-amber-500 focus:outline-none"
@@ -1801,106 +1786,7 @@ export default function InventoryDashboard() {
       )}
 
       {/* ========================================================= */}
-      {/* MODAL 4: EXCEL EXPORT OPTIONS */}
-      {/* ========================================================= */}
-      {showExportModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                  <FileSpreadsheet className="w-4 h-4" />
-                </div>
-                <h3 className="font-black text-lg text-white">تصدير بيانات المخزون إلى Excel</h3>
-              </div>
-              <button
-                onClick={() => setShowExportModal(false)}
-                className="p-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-xs text-slate-300 leading-relaxed">
-              اختر نوع التقرير المطلوب لتنزيله بصيغة <strong>.xlsx</strong> منسق باللغة العربية وجاهز للطباعة على ورق A4 أفقي مع تمييز النواقص بالألوان:
-            </p>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => handleDownloadExcel('all')}
-                disabled={isExporting}
-                className="w-full text-right p-4 rounded-2xl bg-slate-950 border border-emerald-600/60 hover:bg-emerald-950/30 transition-all flex items-center justify-between group"
-              >
-                <div>
-                  <h4 className="font-bold text-sm text-emerald-300">
-                    ملف Excel متكامل (3 أوراق عمل في ملف واحد)
-                  </h4>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    يشمل: المخزون الحالي + سجل المشتريات + سجل الاستهلاك والتالف
-                  </p>
-                </div>
-                <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                  شامل
-                </span>
-              </button>
-
-              <button
-                onClick={() => handleDownloadExcel('inventory')}
-                disabled={isExporting}
-                className="w-full text-right p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/40 transition-all flex items-center justify-between"
-              >
-                <div>
-                  <h4 className="font-bold text-sm text-slate-200">تقرير المخزون الحالي فقط</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    الكميات الحالية، الحدود الدنيا، النواقص، والقيمة التقديرية
-                  </p>
-                </div>
-                <span className="text-xs text-slate-500 font-bold">ورقة واحدة</span>
-              </button>
-
-              <button
-                onClick={() => handleDownloadExcel('purchases')}
-                disabled={isExporting}
-                className="w-full text-right p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/40 transition-all flex items-center justify-between"
-              >
-                <div>
-                  <h4 className="font-bold text-sm text-slate-200">تقرير سجل المشتريات فقط</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    تفاصيل كافة التوريدات والفواتير والتكاليف والموردين
-                  </p>
-                </div>
-                <span className="text-xs text-slate-500 font-bold">ورقة واحدة</span>
-              </button>
-
-              <button
-                onClick={() => handleDownloadExcel('usage')}
-                disabled={isExporting}
-                className="w-full text-right p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/40 transition-all flex items-center justify-between"
-              >
-                <div>
-                  <h4 className="font-bold text-sm text-slate-200">تقرير سجل الاستهلاك والتالف فقط</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    المواد المنصرفة للطهي والتالف والملاحظات
-                  </p>
-                </div>
-                <span className="text-xs text-slate-500 font-bold">ورقة واحدة</span>
-              </button>
-            </div>
-
-            <div className="pt-3 border-t border-slate-800 flex justify-end">
-              <button
-                onClick={() => setShowExportModal(false)}
-                className="px-5 py-2.5 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs"
-              >
-                إغلاق
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* MODAL 5: PWA INSTALL GUIDE */}
+      {/* MODAL 4: PWA INSTALL GUIDE */}
       {/* ========================================================= */}
       {showInstallGuideModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1970,7 +1856,7 @@ export default function InventoryDashboard() {
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-slate-800 py-4 px-4 text-center text-xs text-slate-500 no-print">
         <p>
-          نظام إدارة مخزون ومشتريات مطعم المندي والمأكولات اليمنية • فرع سوهاج (الكورنيش الغربي - نادي النيل) • متوافق مع شاشات الكمبيوتر والتابلت والموبايل
+          برنامج إدارة مخزون مطعم واحة النيل • للمأكولات اليمنية • فرع سوهاج (الكورنيش الغربي - نادي النيل) • متوافق مع الكمبيوتر والموبايل
         </p>
       </footer>
     </div>

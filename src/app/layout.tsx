@@ -10,7 +10,7 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "نظام إدارة المخزون والمشتريات | مطعم المندي والمأكولات اليمنية",
+  title: "برنامج إدارة مخزون مطعم واحة النيل للمأكولات اليمنية",
   description: "برنامج مبسط وعملي لإدارة مخزون المواد الخام والمشتريات والاستهلاك وتصدير تقارير Excel",
   manifest: "/manifest.json",
   icons: {
